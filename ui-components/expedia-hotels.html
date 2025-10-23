@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotel Search Results</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      margin: 0; 
+      padding: 16px; 
+      background: #f5f5f7;
+    }
+    .header {
+      margin-bottom: 24px;
+    }
+    .search-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+    .search-subtitle {
+      font-size: 16px;
+      color: #666;
+    }
+    .hotels-container { 
+      display: grid; 
+      gap: 16px;
+    }
+    .hotel-card { 
+      background: white; 
+      border-radius: 12px; 
+      overflow: hidden; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
+      transition: all 0.3s ease;
+      cursor: pointer;
+      display: flex;
+    }
+    .hotel-card:hover { 
+      transform: translateY(-2px); 
+      box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+    }
+    .hotel-image { 
+      width: 240px; 
+      height: 180px; 
+      object-fit: cover;
+      background: #e0e0e0;
+    }
+    .hotel-info { 
+      flex: 1; 
+      padding: 20px;
+    }
+    .hotel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 12px;
+    }
+    .hotel-name { 
+      font-size: 22px; 
+      font-weight: 700; 
+      color: #1a1a1a;
+    }
+    .hotel-price {
+      text-align: right;
+    }
+    .price-amount { 
+      font-size: 28px; 
+      font-weight: 800; 
+      color: #0066cc;
+    }
+    .price-label {
+      font-size: 13px;
+      color: #666;
+    }
+    .hotel-rating {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .stars {
+      color: #ffa500;
+      font-size: 18px;
+    }
+    .rating-score {
+      font-weight: 600;
+      font-size: 16px;
+    }
+    .review-count {
+      font-size: 14px;
+      color: #666;
+    }
+    .hotel-location {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 12px;
+    }
+    .amenities {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .amenity {
+      padding: 6px 12px;
+      background: #e3f2fd;
+      color: #1976d2;
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    @media (max-width: 768px) {
+      .hotel-card {
+        flex-direction: column;
+      }
+      .hotel-image {
+        width: 100%;
+        height: 200px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script>
+    (function() {
+      const props = window.__WIDGET_PROPS__ || {};
+      const { 
+        hotels = [], 
+        destination = 'Search Results', 
+        checkIn = '', 
+        checkOut = '', 
+        totalResults = 0 
+      } = props;
+      
+      const root = document.getElementById('root');
+      
+      // Header
+      const header = document.createElement('div');
+      header.className = 'header';
+      header.innerHTML = '<div class="search-title">' + destination + '</div><div class="search-subtitle">' + checkIn + ' - ' + checkOut + ' · ' + totalResults + ' hotels found</div>';
+      root.appendChild(header);
+      
+      // Hotels container
+      const container = document.createElement('div');
+      container.className = 'hotels-container';
+      
+      if (hotels.length === 0) {
+        container.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">No hotels found</div>';
+      } else {
+        hotels.forEach(hotel => {
+          const card = document.createElement('div');
+          card.className = 'hotel-card';
+          
+          const starsHTML = '★'.repeat(hotel.starRating) + '☆'.repeat(5 - hotel.starRating);
+          const amenitiesHTML = hotel.amenities.map(a => '<span class="amenity">' + a + '</span>').join('');
+          
+          card.innerHTML = '<img src="' + (hotel.imageUrl || 'https://via.placeholder.com/240x180') + '" class="hotel-image" onerror="this.src=\'https://via.placeholder.com/240x180\'"><div class="hotel-info"><div class="hotel-header"><div><div class="hotel-name">' + hotel.name + '</div></div><div class="hotel-price"><div class="price-amount">$' + hotel.pricePerNight + '</div><div class="price-label">per night</div></div></div><div class="hotel-rating"><span class="stars">' + starsHTML + '</span><span class="rating-score">' + hotel.rating + '</span><span class="review-count">(' + hotel.reviewCount.toLocaleString() + ' reviews)</span></div><div class="hotel-location">📍 ' + hotel.distance + '</div><div class="amenities">' + amenitiesHTML + '</div></div>';
+          
+          card.addEventListener('click', () => {
+            if (window.parent && window.parent.postMessage) {
+              window.parent.postMessage({
+                type: 'hotel-selected',
+                data: { hotelId: hotel.id, hotelName: hotel.name }
+              }, '*');
+            }
+          });
+          
+          container.appendChild(card);
+        });
+      }
+      
+      root.appendChild(container);
+    })();
+  </script>
+</body>
+</html>
+
