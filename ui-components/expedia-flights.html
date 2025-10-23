@@ -3,206 +3,597 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Flight Search Results</title>
+  <title>Expedia Flight Search Results</title>
   <style>
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body { 
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      margin: 0; 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
+      background: #fff;
+      overflow-x: hidden;
+    }
+
+    .expedia-container {
+      width: 100%;
+      height: 100%;
+      overflow-y: hidden;
+    }
+
+    .uitk-spacing-margin-blockstart-half {
+      margin-top: 8px;
+    }
+
+    .uitk-carousel {
+      position: relative;
+      width: 100%;
       padding: 16px; 
-      background: #f5f5f7;
     }
-    .header {
-      margin-bottom: 24px;
+
+    .uitk-carousel-container {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      padding: 4px;
     }
-    .search-title {
-      font-size: 28px;
-      font-weight: 700;
-      color: #1a1a1a;
-      margin-bottom: 8px;
+
+    .uitk-carousel-container::-webkit-scrollbar {
+      display: none;
     }
-    .search-subtitle {
-      font-size: 16px;
-      color: #666;
+
+    .uitk-carousel-item {
+      flex: 0 0 auto;
+      width: 380px;
+      min-width: 320px;
     }
-    .flights-container { 
-      display: grid; 
-      gap: 16px;
+
+    .carousel-card-visible {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.3s ease, transform 0.3s ease;
     }
-    .flight-card { 
-      background: white; 
-      border-radius: 12px; 
-      padding: 24px; 
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
+
+    .uitk-card {
+      background: transparent; 
+      border: 1px solid #e0e0e0;
+      border-radius: 24px; 
+      overflow: hidden;
       transition: all 0.3s ease;
       cursor: pointer;
+      position: relative;
+      display: flex;
+      flex-direction: column;
     }
-    .flight-card:hover { 
+
+    .uitk-card:hover {
       transform: translateY(-2px); 
-      box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-    .flight-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
+
+    .uitk-card-content-section {
+      padding: 16px;
     }
-    .airline-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+
+    .uitk-card-content-section-padded {
+      padding: 16px;
     }
-    .airline-logo {
-      width: 50px;
-      height: 50px;
-      border-radius: 8px;
-      background: #e0e0e0;
-      object-fit: cover;
-    }
-    .airline-name {
-      font-weight: 600;
-      font-size: 18px;
-    }
-    .flight-number {
-      font-size: 14px;
-      color: #666;
-    }
-    .price {
-      font-size: 32px;
-      font-weight: 800;
-      color: #0066cc;
-    }
-    .flight-route {
-      display: flex;
-      align-items: center;
+
+    /* Header Section - Trip Type and Price */
+    .flight-header-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
       gap: 16px;
       margin-bottom: 16px;
     }
-    .route-time {
-      font-size: 24px;
-      font-weight: 700;
+
+    .uitk-heading-4 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 4px;
     }
-    .route-code {
+
+    .uitk-heading-3 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    .uitk-type-300 {
       font-size: 14px;
       color: #666;
-      margin-top: 4px;
     }
-    .route-line {
-      flex: 1;
-      height: 2px;
-      background: #e0e0e0;
-      position: relative;
+
+    .uitk-text-secondary-theme {
+      color: #666;
     }
-    .route-plane {
-      position: absolute;
-      top: -8px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 18px;
-    }
-    .flight-details {
+
+    /* Flight Details Section */
+    .flight-details-section {
       display: flex;
-      gap: 24px;
-      padding-top: 16px;
-      border-top: 1px solid #f0f0f0;
+      flex-direction: column;
+      gap: 12px;
     }
-    .detail {
+
+    .flight-route-container {
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 14px;
-      color: #666;
     }
-    .detail-value {
+
+    .airline-mark {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .flight-timeline {
+      flex: 1;
+      min-width: 220px;
+    }
+
+    .step-indicator-brand-color {
+      width: 100%;
+    }
+
+    .timeline-flex {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step-indicator-brand-color-time {
+      font-size: 16px;
+      font-weight: 600;
+      white-space: nowrap;
+      color: #1a1a1a;
+    }
+
+    .timeline-line-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .step-indicator-brand-color-line {
+      height: 2px;
+      background: #d0d0d0;
+      flex: 1;
+    }
+
+    .step-indicator-brand-color-icon {
+      width: 10px;
+      height: 10px;
+      fill: #d0d0d0;
+      flex-shrink: 0;
+    }
+
+    .different-day-arrival {
+      margin-left: 4px;
+    }
+
+    .different-day-arrival sup {
+      font-size: 10px;
+      color: #d32f2f;
+      font-weight: 700;
+    }
+
+    /* Flight Info Grid */
+    .flight-info-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .uitk-subheading {
+      font-size: 14px;
       font-weight: 600;
       color: #1a1a1a;
     }
-    .stops-badge {
-      padding: 4px 12px;
-      background: #4caf50;
+
+    .flight-meta-flex {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .flight-meta-flex .uitk-type-300 {
+      font-size: 14px;
+      font-weight: 500;
+      color: #1a1a1a;
+    }
+
+    /* Action Section */
+    .action-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    .uitk-button-primary {
+      width: 100%;
+      background: #0066cc;
       color: white;
-      border-radius: 12px;
-      font-size: 12px;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 14px;
       font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease;
     }
-    .stops-badge.has-stops {
-      background: #ff9800;
+
+    .uitk-button-primary:hover {
+      background: #0052a3;
     }
-    @media (max-width: 768px) {
-      .flight-header {
+
+    .uitk-link {
+      text-align: center;
+      color: #0066cc;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 8px;
+      transition: color 0.2s ease;
+    }
+
+    .uitk-link:hover {
+      color: #0052a3;
+      text-decoration: underline;
+    }
+
+    .uitk-card-link {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+
+    .is-visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      border: 0;
+    }
+
+    /* Carousel Controls */
+    .uitk-carousel-controls {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      transform: translateY(-50%);
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .uitk-carousel-button-paging {
+      pointer-events: all;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: white;
+      border: 1px solid #ddd;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      margin: 0 8px;
+    }
+
+    .uitk-carousel-button-paging:hover:not(:disabled) {
+      background: #f5f5f5;
+      transform: scale(1.05);
+    }
+
+    .uitk-carousel-button-paging:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .uitk-carousel-button-paging-hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .uitk-icon {
+      width: 20px;
+      height: 20px;
+      fill: #1a1a1a;
+    }
+
+    /* Layout utilities */
+    .uitk-layout-flex {
+      display: flex;
+    }
+
+    .uitk-layout-flex-flex-direction-column {
         flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-      }
-      .flight-route {
+    }
+
+    .uitk-layout-flex-justify-content-flex-end {
+      justify-content: flex-end;
+    }
+
+    .uitk-layout-flex-align-items-flex-end {
+      align-items: flex-end;
+    }
+
+    .uitk-layout-flex-gap-half {
         gap: 8px;
       }
-      .route-time {
-        font-size: 18px;
+
+    .uitk-layout-flex-gap-two {
+      gap: 8px;
       }
-      .flight-details {
-        flex-wrap: wrap;
+
+    .uitk-layout-flex-gap-three {
         gap: 12px;
+    }
+
+    @media (max-width: 768px) {
+      .uitk-carousel-item {
+        width: 100%;
+        min-width: 280px;
       }
     }
   </style>
 </head>
 <body>
-  <div id="root"></div>
+  <div data-stid="flights-card" class="expedia-container" style="width: 100%; height: 100%; overflow-y: hidden;">
+    <div id="flight-card-carousel" class="uitk-spacing uitk-spacing-margin-blockstart-half">
+      <div class="uitk-carousel no-touch items-max-height carousel-container md" data-stid="carousel-wrapper">
+        <div class="uitk-carousel-container has-natural-width-items use-container-sizing" data-stid="carousel-container" tabindex="0" id="carousel-container">
+          <!-- Flights will be inserted here -->
+        </div>
+        <div class="uitk-carousel-controls">
+          <button data-stid="carousel-nav-prev" id="prev-btn" aria-label="Show previous card" type="button" class="uitk-carousel-button-paging uitk-carousel-button-paging-prev uitk-carousel-button-paging-hidden">
+            <svg class="uitk-icon" aria-label="Show previous card" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <title>Show previous card</title>
+              <path d="M10.793 5a.5.5 0 0 0-.354.146l-6.146 6.147a1 1 0 0 0 0 1.414l6.146 6.147a.5.5 0 0 0 .354.146h1.914c.258 0 .385-.322.207-.5l-5.5-5.5H19.5a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5H7.414l5.502-5.502c.175-.18.047-.498-.209-.498h-1.914z"></path>
+            </svg>
+          </button>
+          <button data-stid="carousel-nav-next" id="next-btn" aria-label="Show next card" type="button" class="uitk-carousel-button-paging uitk-carousel-button-paging-next">
+            <svg class="uitk-icon" aria-label="Show next card" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <title>Show next card</title>
+              <path d="m11.086 5.5 5.5 5.5H4.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h12.086l-5.505 5.505c-.172.18-.043.495.212.495h1.914a.5.5 0 0 0 .354-.146l6.146-6.147a1 1 0 0 0 0-1.414l-6.146-6.147A.5.5 0 0 0 13.207 5h-1.914c-.258 0-.385.322-.207.5z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     (function() {
       const props = window.__WIDGET_PROPS__ || {};
       const { 
         flights = [], 
-        origin = '', 
-        destination = '', 
-        departureDate = '', 
+        origin = 'SEA', 
+        destination = 'SJD', 
+        departureDate = 'Nov 22', 
         isRoundTrip = false, 
         returnDate = '', 
         totalResults = 0 
       } = props;
       
-      const root = document.getElementById('root');
+      const container = document.getElementById('carousel-container');
+      const prevBtn = document.getElementById('prev-btn');
+      const nextBtn = document.getElementById('next-btn');
       
-      // Header
-      const header = document.createElement('div');
-      header.className = 'header';
-      const tripType = isRoundTrip ? 'Round-trip' : 'One-way';
-      header.innerHTML = '<div class="search-title">' + origin + ' → ' + destination + '</div><div class="search-subtitle">' + tripType + ' · ' + departureDate + (isRoundTrip ? ' - ' + returnDate : '') + ' · ' + totalResults + ' flights found</div>';
-      root.appendChild(header);
+      // Helper function to format stops text
+      const formatStops = (stops) => {
+        if (stops === 0) return 'Nonstop';
+        return stops + ' stop' + (stops > 1 ? 's' : '');
+      };
       
-      // Flights container
-      const container = document.createElement('div');
-      container.className = 'flights-container';
+      // Helper function to determine if arrival is next day
+      const isNextDay = (departureTime, arrivalTime) => {
+        // Simple heuristic: if arrival time is numerically less than departure
+        const depHour = parseInt(departureTime.split(':')[0]);
+        const arrHour = parseInt(arrivalTime.split(':')[0]);
+        return arrHour < depHour || departureTime.includes('PM') && arrivalTime.includes('AM');
+      };
       
-      if (flights.length === 0) {
-        container.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">No flights found</div>';
-      } else {
-        flights.forEach(flight => {
+      // Generate flight cards
+      flights.forEach((flight, index) => {
+        const delay = index * 100;
+        const ariaLabel = (index + 1) + ' out of ' + flights.length;
+        const isHidden = index > 3;
+        
+        const tripType = isRoundTrip ? 'Round trip' : 'One way';
+        const stopsText = formatStops(flight.stops);
+        const nextDayIndicator = isNextDay(flight.departureTime, flight.arrivalTime) 
+          ? '<div class="uitk-layout-flex-item different-day-arrival"><span class="uitk-text uitk-type-100 uitk-text-negative-theme"><sup data-test-id="arrives-next-day">+1</sup></span></div>'
+          : '';
+        
+        const airlineLogoUrl = flight.imageUrl || 'https://images.trvl-media.com/media/content/expus/graphics/static_content/fusion/v0.1b/images/airlines/vector/s/multiple_airlines_logo_sq.svg';
+        
           const card = document.createElement('div');
-          card.className = 'flight-card';
-          
-          const stopsText = flight.stops === 0 ? 'Nonstop' : flight.stops + ' stop' + (flight.stops > 1 ? 's' : '');
-          const stopsBadgeClass = flight.stops === 0 ? 'stops-badge' : 'stops-badge has-stops';
-          
-          card.innerHTML = '<div class="flight-header"><div class="airline-info"><img src="' + (flight.imageUrl || 'https://via.placeholder.com/50x50') + '" class="airline-logo" onerror="this.src=\'https://via.placeholder.com/50x50\'"><div><div class="airline-name">' + flight.airline + '</div><div class="flight-number">' + flight.flightNumber + '</div></div></div><div class="price">$' + flight.price + '</div></div><div class="flight-route"><div><div class="route-time">' + flight.departureTime + '</div><div class="route-code">' + flight.origin + '</div></div><div class="route-line"><span class="route-plane">✈️</span></div><div style="text-align: right;"><div class="route-time">' + flight.arrivalTime + '</div><div class="route-code">' + flight.destination + '</div></div></div><div class="flight-details"><div class="detail"><span>Duration:</span><span class="detail-value">' + flight.duration + '</span></div><div class="detail"><span class="' + stopsBadgeClass + '">' + stopsText + '</span></div><div class="detail"><span>Class:</span><span class="detail-value">' + flight.cabinClass + '</span></div></div>';
-          
-          card.addEventListener('click', () => {
+        card.className = 'uitk-carousel-item';
+        card.setAttribute('data-stid', 'carousel-item');
+        card.setAttribute('aria-label', ariaLabel);
+        if (isHidden) {
+          card.setAttribute('aria-hidden', 'true');
+          card.setAttribute('tabindex', '-1');
+        }
+        
+        card.innerHTML = `
+          <div class="carousel-card-visible" style="transition-delay: ${delay}ms;">
+            <div class="uitk-card uitk-card-roundcorner-all uitk-card-has-border uitk-card-has-link uitk-card-padded carousel-card-flight uitk-card-has-primary-theme">
+              <!-- Header Section -->
+              <div class="uitk-card-content-section uitk-card-content-section-padded">
+                <div class="flight-header-grid">
+                  <div class="uitk-layout-flex uitk-layout-flex-flex-direction-column uitk-layout-flex-justify-content-flex-end">
+                    <h2 class="uitk-heading uitk-heading-4" aria-label="${tripType} flight">${tripType}</h2>
+                    <div class="uitk-text uitk-type-300 uitk-text-secondary-theme">
+                      <span class="is-visually-hidden">Traveling ${departureDate}</span>
+                      <span aria-hidden="true">${departureDate}</span>
+                    </div>
+                  </div>
+                  <div class="uitk-layout-flex uitk-layout-flex-align-items-flex-end uitk-layout-flex-flex-direction-column uitk-layout-flex-gap-half">
+                    <h2 class="uitk-heading uitk-heading-3" style="margin-bottom: -0.5px;">$${flight.price}</h2>
+                    <div class="uitk-text uitk-type-300 uitk-text-secondary-theme">USD per adult</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Flight Details Section -->
+              <div class="uitk-card-content-section uitk-card-content-section-padded">
+                <div class="uitk-layout-flex uitk-layout-flex-flex-direction-column uitk-layout-flex-gap-three">
+                  <div class="uitk-layout-flex flight-route-container">
+                    <img class="airline-mark" alt="${flight.airline}" src="${airlineLogoUrl}" onerror="this.src='https://images.trvl-media.com/media/content/expus/graphics/static_content/fusion/v0.1b/images/airlines/vector/s/multiple_airlines_logo_sq.svg'">
+                    <div class="flight-timeline">
+                      <span class="is-visually-hidden">Departs ${flight.departureTime}, arrives ${flight.arrivalTime}</span>
+                      <span aria-hidden="true">
+                        <div class="step-indicator-brand-color">
+                          <div class="timeline-flex">
+                            <div class="step-indicator-brand-color-time">${flight.departureTime}</div>
+                            <div class="timeline-line-container">
+                              <div class="step-indicator-brand-color-line"></div>
+                              <svg class="uitk-icon step-indicator-brand-color-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">
+                                <circle cx="5" cy="5" r="5"></circle>
+                              </svg>
+                              <div class="step-indicator-brand-color-line"></div>
+                            </div>
+                            <div class="timeline-flex">
+                              <div class="step-indicator-brand-color-time">${flight.arrivalTime}</div>
+                              ${nextDayIndicator}
+                            </div>
+                          </div>
+                        </div>
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div class="flight-info-grid">
+                    <h3 class="uitk-subheading">
+                      <span aria-hidden="true">${origin} - ${destination}</span>
+                      <span class="is-visually-hidden">From ${origin} to ${destination}</span>
+                    </h3>
+                    <div class="flight-meta-flex">
+                      <div class="uitk-text uitk-type-300 uitk-type-medium uitk-text-default-theme">
+                        <span aria-hidden="true">${flight.duration}</span>
+                        <span class="is-visually-hidden">${flight.duration} total travel time</span>
+                      </div>
+                      <div class="uitk-text uitk-type-300 uitk-type-medium uitk-text-default-theme">
+                        <span aria-hidden="true">• ${stopsText}</span>
+                        <span class="is-visually-hidden">${stopsText}</span>
+                      </div>
+                    </div>
+                    <h3 class="uitk-subheading">${flight.cabinClass}</h3>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Action Section -->
+              <div class="uitk-card-content-section uitk-card-content-section-padded">
+                <div class="action-section">
+                  <button aria-hidden="true" role="link" type="button" class="uitk-button uitk-button-medium uitk-button-fullWidth uitk-button-has-text uitk-button-primary" style="z-index: 200;">
+                    <div class="uitk-text uitk-type-300 uitk-text-inverse-theme">Book on Expedia</div>
+                  </button>
+                  <div class="uitk-text uitk-type-300 uitk-type-medium uitk-text-default-theme uitk-link" aria-label="View details for flight from ${origin} to ${destination}." role="link">
+                    See fare details
+                  </div>
+                </div>
+              </div>
+              
+              <a aria-label="Book on Expedia" class="uitk-card-link">
+                <span class="is-visually-hidden"></span>
+              </a>
+            </div>
+          </div>
+        `;
+        
+        // Add click handlers
+        const button = card.querySelector('.uitk-button-primary');
+        const detailsLink = card.querySelector('.uitk-link');
+        const cardLink = card.querySelector('.uitk-card-link');
+        
+        [button, detailsLink, cardLink, card].forEach(el => {
+          el.addEventListener('click', (e) => {
+            e.preventDefault();
             if (window.parent && window.parent.postMessage) {
               window.parent.postMessage({
                 type: 'flight-selected',
-                data: { flightId: flight.id, flightNumber: flight.flightNumber }
+                data: { 
+                  flightId: flight.id, 
+                  flightNumber: flight.flightNumber,
+                  airline: flight.airline,
+                  price: flight.price,
+                  origin: origin,
+                  destination: destination,
+                  departureTime: flight.departureTime,
+                  arrivalTime: flight.arrivalTime,
+                  duration: flight.duration,
+                  stops: flight.stops
+                }
               }, '*');
             }
+          });
           });
           
           container.appendChild(card);
         });
+      
+      // Carousel navigation
+      function updateButtons() {
+        const scrollLeft = container.scrollLeft;
+        const maxScroll = container.scrollWidth - container.clientWidth;
+        
+        if (scrollLeft <= 0) {
+          prevBtn.classList.add('uitk-carousel-button-paging-hidden');
+          prevBtn.disabled = true;
+        } else {
+          prevBtn.classList.remove('uitk-carousel-button-paging-hidden');
+          prevBtn.disabled = false;
+        }
+        
+        if (scrollLeft >= maxScroll - 1) {
+          nextBtn.classList.add('uitk-carousel-button-paging-hidden');
+          nextBtn.disabled = true;
+        } else {
+          nextBtn.classList.remove('uitk-carousel-button-paging-hidden');
+          nextBtn.disabled = false;
+        }
       }
       
-      root.appendChild(container);
+      prevBtn.addEventListener('click', () => {
+        const scrollAmount = container.clientWidth * 0.8;
+        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+      });
+      
+      nextBtn.addEventListener('click', () => {
+        const scrollAmount = container.clientWidth * 0.8;
+        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      });
+      
+      container.addEventListener('scroll', updateButtons);
+      window.addEventListener('resize', updateButtons);
+      
+      // Initial button state
+      updateButtons();
+      
+      // Show empty state if no flights
+      if (flights.length === 0) {
+        container.innerHTML = '<div style="text-align: center; padding: 40px; color: #999; width: 100%;">No flights found</div>';
+        prevBtn.style.display = 'none';
+        nextBtn.style.display = 'none';
+      }
     })();
   </script>
 </body>
 </html>
-
