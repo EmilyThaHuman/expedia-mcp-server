@@ -16,7 +16,7 @@ interface Flight {
   imageUrl?: string;
 }
 
-interface ExpediaFlightsProps {
+interface ExpediaFlightsProps extends Record<string, unknown> {
   flights?: Flight[];
   origin?: string;
   destination?: string;
@@ -26,8 +26,8 @@ interface ExpediaFlightsProps {
   totalResults?: number;
 }
 
-const ExpediaFlights: React.FC = () => {
-  const props = useWidgetProps<ExpediaFlightsProps>({
+const ExpediaFlights: React.FC<ExpediaFlightsProps> = (defaultProps) => {
+  const props = useWidgetProps<ExpediaFlightsProps>(defaultProps || {
     flights: [],
     origin: 'SEA',
     destination: 'SJD',

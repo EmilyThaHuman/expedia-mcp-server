@@ -12,7 +12,7 @@ interface Hotel {
   imageUrl?: string;
 }
 
-interface ExpediaHotelsProps {
+interface ExpediaHotelsProps extends Record<string, unknown> {
   hotels?: Hotel[];
   destination?: string;
   checkIn?: string;
@@ -20,8 +20,8 @@ interface ExpediaHotelsProps {
   totalResults?: number;
 }
 
-const ExpediaHotels: React.FC = () => {
-  const props = useWidgetProps<ExpediaHotelsProps>({
+const ExpediaHotels: React.FC<ExpediaHotelsProps> = (defaultProps) => {
+  const props = useWidgetProps<ExpediaHotelsProps>(defaultProps || {
     hotels: [],
     destination: 'Search Results',
     checkIn: '',
