@@ -1,0 +1,1 @@
+import{c as o,j as t,R as r}from"./utils-CEUOy6Iw.js";import{E as s}from"./expedia-flights-C5lgC7mL.js";const e=document.getElementById("root");e&&o.createRoot(e).render(t.jsx(r.StrictMode,{children:t.jsx(s,{})}));

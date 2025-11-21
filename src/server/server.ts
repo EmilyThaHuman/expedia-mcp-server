@@ -42,23 +42,49 @@ type ExpediaWidget = {
 };
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT_DIR = path.resolve(__dirname, "..");
-const UI_COMPONENTS_DIR = path.resolve(ROOT_DIR, "ui-components");
+const ROOT_DIR = path.resolve(__dirname, "..", "..");
+const ASSETS_DIR = path.resolve(ROOT_DIR, "assets");
 
 function readWidgetHtml(componentName: string): string {
-  if (!fs.existsSync(UI_COMPONENTS_DIR)) {
-    console.warn(`Widget components directory not found at ${UI_COMPONENTS_DIR}`);
-    return `<!DOCTYPE html><html><body><div id="root">Widget: ${componentName}</div></body></html>`;
+  if (!fs.existsSync(ASSETS_DIR)) {
+    throw new Error(
+      `Widget assets not found. Expected directory ${ASSETS_DIR}. Run "npm run build" before starting the server.`
+    );
   }
 
-  const htmlPath = path.join(UI_COMPONENTS_DIR, `${componentName}.html`);
-  
-  if (fs.existsSync(htmlPath)) {
-    return fs.readFileSync(htmlPath, "utf8");
+  // Try direct path first
+  const directPath = path.join(ASSETS_DIR, `${componentName}.html`);
+  let htmlContents: string | null = null;
+
+  if (fs.existsSync(directPath)) {
+    htmlContents = fs.readFileSync(directPath, "utf8");
   } else {
-    console.warn(`Widget HTML for "${componentName}" not found`);
-    return `<!DOCTYPE html><html><body><div id="root">Widget: ${componentName}</div></body></html>`;
+    // Check for versioned files like "component-hash.html"
+    const candidates = fs
+      .readdirSync(ASSETS_DIR)
+      .filter(
+        (file) => file.startsWith(`${componentName}-`) && file.endsWith(".html")
+      )
+      .sort();
+    const fallback = candidates[candidates.length - 1];
+    if (fallback) {
+      htmlContents = fs.readFileSync(path.join(ASSETS_DIR, fallback), "utf8");
+    } else {
+      // Check in src/components subdirectory as fallback
+      const nestedPath = path.join(ASSETS_DIR, "src", "components", `${componentName}.html`);
+      if (fs.existsSync(nestedPath)) {
+        htmlContents = fs.readFileSync(nestedPath, "utf8");
+      }
+    }
   }
+
+  if (!htmlContents) {
+    throw new Error(
+      `Widget HTML for "${componentName}" not found in ${ASSETS_DIR}. Run "npm run build" to generate the assets.`
+    );
+  }
+
+  return htmlContents;
 }
 
 function widgetMeta(widget: ExpediaWidget) {
@@ -264,7 +290,7 @@ async function searchHotelsAPI(params: {
       return null;
     }
 
-    const searchData = await searchResponse.json();
+    const searchData: any = await searchResponse.json();
     if (!searchData.data || searchData.data.length === 0) {
       console.warn("[server.ts][268] --> No destination found for:", params.destination);
       return null;
@@ -301,7 +327,7 @@ async function searchHotelsAPI(params: {
       return null;
     }
 
-    const hotelsData = await hotelsResponse.json();
+    const hotelsData: any = await hotelsResponse.json();
     
     // Transform API response to our format
     const hotels = (hotelsData.data?.hotels || [])
@@ -386,7 +412,7 @@ async function searchFlightsAPI(params: {
       return null;
     }
 
-    const flightsData = await response.json();
+    const flightsData: any = await response.json();
     
     // Transform API response to our format
     const flights = (flightsData.data?.itineraries || [])
