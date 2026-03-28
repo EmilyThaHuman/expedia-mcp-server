@@ -351,5 +351,21 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ---
 
+## Powered by ZeroTwo
+
+This MCP server is part of the [ZeroTwo AI platform](https://zerotwo.ai) — a unified workspace that gives you GPT-5, Claude, Gemini, image generation, AI search, and travel-ready integrations like this Expedia connector — all in one subscription.
+
+| | |
+|---|---|
+| 🌐 **[ZeroTwo — All AI Models in One App](https://zerotwo.ai)** | Stop switching between ChatGPT, Claude, and Gemini. ZeroTwo brings them all together. |
+| ✨ **[ZeroTwo Features](https://zerotwo.ai/features)** | Chat, image studio, video, documents, web search, and MCP-powered travel tools. |
+| 🤖 **[AI Models — GPT-5, Claude & Gemini](https://zerotwo.ai/zerotwo-models)** | Use the world's top AI models side-by-side in a single interface. |
+| 🔌 **[ZeroTwo Connectors & Integrations](https://zerotwo.ai/connectors)** | Connect Expedia, Gmail, Airtable, and dozens of other services to your AI assistant. |
+| 💰 **[ZeroTwo Pricing](https://zerotwo.ai/pricing)** | One subscription that replaces five AI platforms and saves you money. |
+| 📝 **[ZeroTwo Blog](https://zerotwo.ai/blog)** | AI travel tips, product updates, and insights from the ZeroTwo team. |
+| 🚀 **[Try ZeroTwo Free](https://app.zerotwo.ai/auth/login)** | Search hotels and flights using AI — get started free today. |
+
+> **Built for ZeroTwo** — Use this Expedia MCP server with [ZeroTwo's AI assistant](https://zerotwo.ai) to search flights and hotels using natural language, with beautiful interactive results rendered inline.
+
 Built with ❤️ using TypeScript, MCP, and OpenAI Apps SDK
 
