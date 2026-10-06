@@ -20,8 +20,8 @@ interface ExpediaHotelsProps extends Record<string, unknown> {
   totalResults?: number;
 }
 
-const ExpediaHotels: React.FC<ExpediaHotelsProps> = (defaultProps) => {
-  const props = useWidgetProps<ExpediaHotelsProps>(defaultProps || {
+const ExpediaHotels: React.FC<ExpediaHotelsProps> = (externalProps) => {
+  const props = useWidgetProps<ExpediaHotelsProps>({
     hotels: [],
     destination: 'Search Results',
     checkIn: '',
@@ -29,13 +29,16 @@ const ExpediaHotels: React.FC<ExpediaHotelsProps> = (defaultProps) => {
     totalResults: 0,
   });
 
+  // Merge external props (for preview mode) with widget props
+  const finalProps = { ...props, ...externalProps };
+
   const {
     hotels = [],
     destination = 'Search Results',
     checkIn = '',
     checkOut = '',
     totalResults = 0,
-  } = props;
+  } = finalProps;
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [showPrevBtn, setShowPrevBtn] = useState(false);
@@ -143,11 +146,11 @@ const ExpediaHotels: React.FC<ExpediaHotelsProps> = (defaultProps) => {
                       <div className="flex justify-between">
                         <div className="flex items-start justify-between flex-1">
                           <div className="flex-1">
-                            <h3 className="text-base font-semibold leading-snug text-gray-900 mb-1 pr-2 line-clamp-2">
+                            <h3 className="text-base font-normal leading-snug text-foreground mb-1 pr-2 line-clamp-2">
                               {hotel.name}
                             </h3>
                             {hotel.neighborhood && (
-                              <div className="text-sm text-gray-600 truncate mb-2">
+                              <div className="text-sm text-muted-foreground truncate mb-2">
                                 {hotel.neighborhood}
                               </div>
                             )}
@@ -155,7 +158,7 @@ const ExpediaHotels: React.FC<ExpediaHotelsProps> = (defaultProps) => {
                           <div className="flex-shrink-0">
                             <span className={cn(
                               "inline-flex items-center justify-center min-w-[32px] h-6 px-2",
-                              "rounded-md text-[13px] font-bold",
+                              "rounded-md text-[13px] font-normal",
                               badgeClass
                             )}>
                               {hotel.rating.toFixed(1)}
@@ -168,18 +171,18 @@ const ExpediaHotels: React.FC<ExpediaHotelsProps> = (defaultProps) => {
                     <div className="mt-auto">
                       <div className="flex flex-col mb-2">
                         <div className="flex items-center gap-1 flex-wrap">
-                          <div className="text-xl font-bold text-gray-900">
+                          <div className="text-xl font-normal text-foreground">
                             ${hotel.pricePerNight.toLocaleString()} total
                           </div>
                         </div>
-                        <div className="text-sm text-gray-600 truncate">
+                        <div className="text-sm text-muted-foreground truncate">
                           USD • Includes taxes and fees
                         </div>
                       </div>
                       <button
                         className={cn(
                           "w-full bg-gray-900 text-white border-none rounded-3xl py-2.5 px-4",
-                          "text-sm font-semibold cursor-pointer transition-colors duration-200",
+                          "text-sm font-normal cursor-pointer transition-colors duration-200",
                           "hover:bg-gray-800 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
                         )}
                         style={{ zIndex: 200 }}
@@ -200,14 +203,14 @@ const ExpediaHotels: React.FC<ExpediaHotelsProps> = (defaultProps) => {
             onClick={() => scroll('left')}
             disabled={!showPrevBtn}
             className={cn(
-              "pointer-events-auto w-10 h-10 rounded-3xl bg-white border border-gray-300",
+              "pointer-events-auto w-10 h-10 rounded-3xl bg-background border border-border",
               "shadow-md cursor-pointer flex items-center justify-center transition-all duration-200 mx-2",
-              "hover:bg-gray-50 hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed",
+              "hover:bg-muted hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed",
               !showPrevBtn && "opacity-0 pointer-events-none"
             )}
             aria-label="Show previous card"
           >
-            <svg className="w-6 h-6 stroke-gray-900" viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg className="w-6 h-6 stroke-foreground" viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
           </button>
@@ -215,14 +218,14 @@ const ExpediaHotels: React.FC<ExpediaHotelsProps> = (defaultProps) => {
             onClick={() => scroll('right')}
             disabled={!showNextBtn}
             className={cn(
-              "pointer-events-auto w-10 h-10 rounded-3xl bg-white border border-gray-300",
+              "pointer-events-auto w-10 h-10 rounded-3xl bg-background border border-border",
               "shadow-md cursor-pointer flex items-center justify-center transition-all duration-200 mx-2",
-              "hover:bg-gray-50 hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed",
+              "hover:bg-muted hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed",
               !showNextBtn && "opacity-0 pointer-events-none"
             )}
             aria-label="Show next card"
           >
-            <svg className="w-6 h-6 stroke-gray-900" viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg className="w-6 h-6 stroke-foreground" viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="9 18 15 12 9 6"></polyline>
             </svg>
           </button>

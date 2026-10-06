@@ -26,8 +26,8 @@ interface ExpediaFlightsProps extends Record<string, unknown> {
   totalResults?: number;
 }
 
-const ExpediaFlights: React.FC<ExpediaFlightsProps> = (defaultProps) => {
-  const props = useWidgetProps<ExpediaFlightsProps>(defaultProps || {
+const ExpediaFlights: React.FC<ExpediaFlightsProps> = (externalProps) => {
+  const props = useWidgetProps<ExpediaFlightsProps>({
     flights: [],
     origin: 'SEA',
     destination: 'SJD',
@@ -37,6 +37,9 @@ const ExpediaFlights: React.FC<ExpediaFlightsProps> = (defaultProps) => {
     totalResults: 0,
   });
 
+  // Merge external props (for preview mode) with widget props
+  const finalProps = { ...props, ...externalProps };
+
   const {
     flights = [],
     origin = 'SEA',
@@ -44,7 +47,7 @@ const ExpediaFlights: React.FC<ExpediaFlightsProps> = (defaultProps) => {
     departureDate = 'Nov 22',
     isRoundTrip = false,
     totalResults = 0,
-  } = props;
+  } = finalProps;
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [showPrevBtn, setShowPrevBtn] = useState(false);
@@ -149,7 +152,7 @@ const ExpediaFlights: React.FC<ExpediaFlightsProps> = (defaultProps) => {
                 <div
                   onClick={() => handleFlightSelect(flight)}
                   className={cn(
-                    "bg-transparent border border-gray-200 rounded-3xl overflow-hidden",
+                    "bg-transparent border border-border rounded-3xl overflow-hidden",
                     "transition-all duration-300 cursor-pointer h-[320px] flex flex-col"
                   )}
                 >
@@ -157,12 +160,12 @@ const ExpediaFlights: React.FC<ExpediaFlightsProps> = (defaultProps) => {
                   <div className="p-3">
                     <div className="grid grid-cols-[1fr_auto] gap-4 mb-2">
                       <div className="flex flex-col justify-end">
-                        <h2 className="text-lg font-semibold text-gray-900 mb-1">{tripType}</h2>
-                        <div className="text-sm text-gray-600">{departureDate}</div>
+                        <h2 className="text-lg font-normal text-foreground mb-1">{tripType}</h2>
+                        <div className="text-sm text-muted-foreground">{departureDate}</div>
                       </div>
                       <div className="flex flex-col items-end gap-0.5">
-                        <h2 className="text-3xl font-bold text-gray-900">${flight.price}</h2>
-                        <div className="text-sm text-gray-600">USD per adult</div>
+                        <h2 className="text-3xl font-normal text-foreground">${flight.price}</h2>
+                        <div className="text-sm text-muted-foreground">USD per adult</div>
                       </div>
                     </div>
                   </div>
@@ -181,23 +184,23 @@ const ExpediaFlights: React.FC<ExpediaFlightsProps> = (defaultProps) => {
                         />
                         <div className="flex-1 min-w-[220px]">
                           <div className="w-full flex items-center gap-2">
-                            <div className="text-base font-semibold whitespace-nowrap text-gray-900">
+                            <div className="text-base font-normal whitespace-nowrap text-foreground">
                               {flight.departureTime}
                             </div>
                             <div className="flex-1 flex items-center gap-1">
-                              <div className="h-0.5 bg-gray-300 flex-1" />
-                              <svg className="w-2.5 h-2.5 fill-gray-300 flex-shrink-0" viewBox="0 0 10 10">
+                              <div className="h-0.5 bg-foreground flex-1" />
+                              <svg className="w-2.5 h-2.5 fill-foreground flex-shrink-0" viewBox="0 0 10 10">
                                 <circle cx="5" cy="5" r="5" />
                               </svg>
-                              <div className="h-0.5 bg-gray-300 flex-1" />
+                              <div className="h-0.5 bg-foreground flex-1" />
                             </div>
                             <div className="flex">
-                              <div className="text-base font-semibold whitespace-nowrap text-gray-900">
+                              <div className="text-base font-normal whitespace-nowrap text-foreground">
                                 {flight.arrivalTime}
                               </div>
                               {nextDay && (
                                 <div className="ml-1">
-                                  <sup className="text-[10px] text-red-700 font-bold">+1</sup>
+                                  <sup className="text-[10px] text-red-600 dark:text-red-400 font-normal">+1</sup>
                                 </div>
                               )}
                             </div>
@@ -206,32 +209,32 @@ const ExpediaFlights: React.FC<ExpediaFlightsProps> = (defaultProps) => {
                       </div>
 
                       <div className="flex flex-col gap-1">
-                        <h3 className="text-sm font-semibold text-gray-900">
+                        <h3 className="text-sm font-normal text-foreground">
                           {origin} - {destination}
                         </h3>
                         <div className="flex gap-2 items-center">
-                          <div className="text-sm font-medium text-gray-900">{flight.duration}</div>
-                          <div className="text-sm font-medium text-gray-900">• {stopsText}</div>
+                          <div className="text-sm font-normal text-foreground">{flight.duration}</div>
+                          <div className="text-sm font-normal text-foreground">• {stopsText}</div>
                         </div>
-                        <h3 className="text-sm font-semibold text-gray-900">{flight.cabinClass}</h3>
+                        <h3 className="text-sm font-normal text-foreground">{flight.cabinClass}</h3>
                       </div>
                     </div>
                   </div>
 
                   {/* Action Section */}
                   <div className="px-3 pb-3 mt-auto">
-                    <div className="flex flex-col gap-1 pt-2 border-t border-gray-100">
+                    <div className="flex flex-col gap-1 pt-2 border-t border-border">
                       <button
                         className={cn(
                           "w-full bg-gray-900 text-white border-none rounded-3xl py-2.5 px-4",
-                          "text-sm font-semibold cursor-pointer transition-colors duration-200",
+                          "text-sm font-normal cursor-pointer transition-colors duration-200",
                           "hover:bg-gray-800 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
                         )}
                         style={{ zIndex: 200 }}
                       >
                         Book on Expedia
                       </button>
-                      <div className="text-center text-blue-600 text-sm font-semibold cursor-pointer py-1 hover:text-blue-700 hover:underline transition-colors">
+                      <div className="text-center text-foreground text-sm font-normal cursor-pointer py-1 hover:underline transition-colors">
                         See fare details
                       </div>
                     </div>
@@ -248,14 +251,14 @@ const ExpediaFlights: React.FC<ExpediaFlightsProps> = (defaultProps) => {
             onClick={() => scroll('left')}
             disabled={!showPrevBtn}
             className={cn(
-              "pointer-events-auto w-10 h-10 rounded-3xl bg-white border border-gray-300",
+              "pointer-events-auto w-10 h-10 rounded-3xl bg-background border border-border",
               "shadow-md cursor-pointer flex items-center justify-center transition-all duration-200 mx-2",
-              "hover:bg-gray-50 hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed",
+              "hover:bg-muted hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed",
               !showPrevBtn && "opacity-0 pointer-events-none"
             )}
             aria-label="Show previous card"
           >
-            <svg className="w-6 h-6 stroke-gray-900" viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg className="w-6 h-6 stroke-foreground" viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
           </button>
@@ -263,14 +266,14 @@ const ExpediaFlights: React.FC<ExpediaFlightsProps> = (defaultProps) => {
             onClick={() => scroll('right')}
             disabled={!showNextBtn}
             className={cn(
-              "pointer-events-auto w-10 h-10 rounded-3xl bg-white border border-gray-300",
+              "pointer-events-auto w-10 h-10 rounded-3xl bg-background border border-border",
               "shadow-md cursor-pointer flex items-center justify-center transition-all duration-200 mx-2",
-              "hover:bg-gray-50 hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed",
+              "hover:bg-muted hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed",
               !showNextBtn && "opacity-0 pointer-events-none"
             )}
             aria-label="Show next card"
           >
-            <svg className="w-6 h-6 stroke-gray-900" viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg className="w-6 h-6 stroke-foreground" viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="9 18 15 12 9 6"></polyline>
             </svg>
           </button>

@@ -805,7 +805,7 @@ const port = Number.isFinite(portEnv) ? portEnv : 8000;
 
 // Helper function to set CORS headers
 function setCorsHeaders(res: ServerResponse, origin?: string) {
-  const allowedOrigins = ['https://zerotwo.ai', 'http://localhost:3000', 'http://localhost:5173'];
+  const allowedOrigins = ['https://zerotwo.ai', 'https://app.zerotwo.ai', 'http://localhost:3000', 'http://localhost:5173'];
   const requestOrigin = origin || '*';
   const allowOrigin = allowedOrigins.includes(requestOrigin) ? requestOrigin : '*';
   res.setHeader("Access-Control-Allow-Origin", allowOrigin);
@@ -845,10 +845,25 @@ const httpServer = createServer(
     // Serve static assets for widgets
     if (req.method === "GET") {
       const assetPath = url.pathname.slice(1);
+      
+      console.log(`[Static Asset Request] Path: ${assetPath}`);
+      console.log(`[Static Asset Request] ASSETS_DIR: ${ASSETS_DIR}`);
+      console.log(`[Static Asset Request] ASSETS_DIR exists: ${fs.existsSync(ASSETS_DIR)}`);
+      
+      if (fs.existsSync(ASSETS_DIR)) {
+        const files = fs.readdirSync(ASSETS_DIR);
+        console.log(`[Static Asset Request] Files in ASSETS_DIR: ${files.join(', ')}`);
+      }
+      
       const fullPath = path.join(ASSETS_DIR, assetPath);
       const resolvedPath = path.resolve(fullPath);
       
+      console.log(`[Static Asset Request] Full path: ${fullPath}`);
+      console.log(`[Static Asset Request] Resolved path: ${resolvedPath}`);
+      console.log(`[Static Asset Request] File exists: ${fs.existsSync(resolvedPath)}`);
+      
       if (!resolvedPath.startsWith(path.resolve(ASSETS_DIR))) {
+        console.log(`[Static Asset Request] Forbidden - path outside assets dir`);
         res.writeHead(403).end("Forbidden");
         return;
       }
@@ -869,6 +884,8 @@ const httpServer = createServer(
         };
         const contentType = contentTypes[ext] || "application/octet-stream";
         
+        console.log(`[Static Asset Request] Serving file with content-type: ${contentType}`);
+        
         res.writeHead(200, {
           "Content-Type": contentType,
           "Access-Control-Allow-Origin": "*",
@@ -876,6 +893,8 @@ const httpServer = createServer(
         });
         fs.createReadStream(resolvedPath).pipe(res);
         return;
+      } else {
+        console.log(`[Static Asset Request] File not found or not a file`);
       }
     }
 
@@ -894,5 +913,30 @@ httpServer.listen(port, '0.0.0.0', () => {
   console.log(
     `  Message post endpoint: POST http://0.0.0.0:${port}${postPath}?sessionId=...`
   );
+  console.log(`  Assets directory: ${ASSETS_DIR}`);
+  console.log(`  Assets directory exists: ${fs.existsSync(ASSETS_DIR)}`);
+  
+  if (fs.existsSync(ASSETS_DIR)) {
+    console.log(`  Assets in directory:`);
+    const listAssets = (dir: string, prefix = '') => {
+      const items = fs.readdirSync(dir);
+      items.forEach(item => {
+        const fullPath = path.join(dir, item);
+        const stat = fs.statSync(fullPath);
+        if (stat.isDirectory()) {
+          console.log(`    ${prefix}${item}/`);
+          listAssets(fullPath, prefix + '  ');
+        } else {
+          console.log(`    ${prefix}${item}`);
+        }
+      });
+    };
+    listAssets(ASSETS_DIR);
+  }
+  
+  console.log(`  Registered widgets:`);
+  widgets.forEach(w => {
+    console.log(`    - ${w.id}: ${w.templateUri}`);
+  });
 });
 

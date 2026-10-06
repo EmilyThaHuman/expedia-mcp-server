@@ -45,3 +45,4 @@ curl https://your-railway-url.up.railway.app/health
 - Built assets are included in the Docker image
 - Server runs on port 8003 by default
 
+
